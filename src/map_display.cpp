@@ -13,24 +13,26 @@
 #include <opencv2/opencv.hpp>
 using namespace cv;
 
-Mat partial_image;
+Mat partial_image, show_image;
 Rect rect;
 ros::Publisher goal_pub;
 
 void on_mouse(int Event, int x, int y, int flags, void*) {
     Mat temp = partial_image.clone();
+    Mat show;
+    resize(partial_image, show, Size(partial_image.cols*2.0, partial_image.rows*2.0));
     Point p(x, y);
     
     switch(Event) {
     	case EVENT_LBUTTONDOWN: {
-	    if(temp.at<Vec3b>(p)[0] > 250) {
-	        printf("%lf %lf\n", (x-200)*0.05, (y-200)*0.05);
+	    if(show.at<Vec3b>(p)[0] > 250) {
+	        printf("%lf %lf\n", (x * 0.5 - 200)*0.05, (y * 0.5 - 200)*0.05);
 
 		move_base_msgs::MoveBaseGoal goal;
 		goal.target_pose.header.frame_id = "map";
 		goal.target_pose.header.stamp = ros::Time::now();
-		goal.target_pose.pose.position.x = (x-200)*0.05;
-		goal.target_pose.pose.position.y = (y-200)*0.05;
+		goal.target_pose.pose.position.x = (x * 0.5 - 200)*0.05;
+		goal.target_pose.pose.position.y = (y * 0.5 - 200)*0.05;
 		geometry_msgs::Quaternion qua_dir;
 		qua_dir = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
 		goal.target_pose.pose.orientation = qua_dir;
@@ -39,10 +41,8 @@ void on_mouse(int Event, int x, int y, int flags, void*) {
 		actionGoal.goal = goal;
 		goal_pub.publish(actionGoal);
 
-	        circle(temp, p, 2, Scalar(255), 3);
-
-		imshow("Map", temp);
-                waitKey(0);
+	        circle(show, p, 2, Scalar(255), 3);
+		show_image = show.clone();
 	    }
 	}
     }
@@ -72,10 +72,12 @@ int main(int argc, char** argv ) {
     rect = Rect(1800, 1800, width, height);
     partial_image = image(rect);
 
-    setMouseCallback("Map", on_mouse, &partial_image);
+    resize(partial_image, show_image, Size(partial_image.cols*2.0, partial_image.rows*2.0));
+
+    setMouseCallback("Map", on_mouse, &show_image);
     while(n.ok()) {
-        imshow("Map", partial_image);
-        waitKey(0);
+        imshow("Map", show_image);
+        waitKey(40);
     }
 
     return 0;

@@ -26,13 +26,13 @@ void on_mouse(int Event, int x, int y, int flags, void*) {
     switch(Event) {
     	case EVENT_LBUTTONDOWN: {
 	    if(show.at<Vec3b>(p)[0] > 250) {
-	        printf("%lf %lf\n", (x * 0.5 - 200)*0.05, (y * 0.5 - 200)*0.05);
+	        printf("%lf %lf\n", (x * 0.5 - 200)*0.05, -(y * 0.5 - 200)*0.05);
 
 		move_base_msgs::MoveBaseGoal goal;
 		goal.target_pose.header.frame_id = "map";
 		goal.target_pose.header.stamp = ros::Time::now();
 		goal.target_pose.pose.position.x = (x * 0.5 - 200)*0.05;
-		goal.target_pose.pose.position.y = (y * 0.5 - 200)*0.05;
+		goal.target_pose.pose.position.y = -(y * 0.5 - 200)*0.05;
 		geometry_msgs::Quaternion qua_dir;
 		qua_dir = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
 		goal.target_pose.pose.orientation = qua_dir;

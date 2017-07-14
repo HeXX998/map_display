@@ -1,13 +1,21 @@
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "map_display/Pose.h"
+
+#include <geometry_msgs/Twist.h>
+#include <geometry_msgs/Pose.h>
+#include <geometry_msgs/Point.h>
+#include <move_base_msgs/MoveBaseAction.h>
+#include <actionlib_msgs/GoalID.h>
+#include <tf/tf.h>
+
 #include <stdio.h>
 #include <opencv2/opencv.hpp>
 using namespace cv;
 
 Mat partial_image;
 Rect rect;
-ros::Publisher chatter_pub;
+ros::Publisher goal_pub;
 
 void on_mouse(int Event, int x, int y, int flags, void*) {
     Mat temp = partial_image.clone();
@@ -18,11 +26,19 @@ void on_mouse(int Event, int x, int y, int flags, void*) {
 	    if(temp.at<Vec3b>(p)[0] > 250) {
 	        printf("%lf %lf\n", (x-200)*0.05, (y-200)*0.05);
 
-		map_display::Pose msg;
-    		msg.xPose = (x-200)*0.05;
-    		msg.yPose = (y-200)*0.05;
+		move_base_msgs::MoveBaseGoal goal;
+		goal.target_pose.header.frame_id = "map";
+		goal.target_pose.header.stamp = ros::Time::now();
+		goal.target_pose.pose.position.x = (x-200)*0.05;
+		goal.target_pose.pose.position.y = (y-200)*0.05;
+		geometry_msgs::Quaternion qua_dir;
+		qua_dir = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+		goal.target_pose.pose.orientation = qua_dir;
+		move_base_msgs::MoveBaseActionGoal actionGoal;
+		actionGoal.goal_id.id = "goal";
+		actionGoal.goal = goal;
+		goal_pub.publish(actionGoal);
 
-                chatter_pub.publish(msg);
 	        circle(temp, p, 2, Scalar(255), 3);
 
 		imshow("Map", temp);
@@ -35,13 +51,7 @@ void on_mouse(int Event, int x, int y, int flags, void*) {
 int main(int argc, char** argv ) {
     ros::init(argc, argv, "map_display");
     ros::NodeHandle n;
-    chatter_pub = n.advertise<map_display::Pose>("map/Pose", 1000);
-
-    map_display::Pose msg;
-    msg.xPose = 0;
-    msg.yPose = 0;
-
-    chatter_pub.publish(msg);
+    goal_pub = n.advertise<move_base_msgs::MoveBaseActionGoal>("move_base/goal", 1);
     
 
     if (argc != 4) {
@@ -63,9 +73,10 @@ int main(int argc, char** argv ) {
     partial_image = image(rect);
 
     setMouseCallback("Map", on_mouse, &partial_image);
-
-    imshow("Map", partial_image);
-    waitKey(0);
+    while(n.ok()) {
+        imshow("Map", partial_image);
+        waitKey(0);
+    }
 
     return 0;
 }

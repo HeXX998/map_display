@@ -69,7 +69,7 @@ int main(int argc, char** argv ) {
     int width = atoi(argv[2]);
     int height = atoi(argv[3]);
 
-    rect = Rect(1800, 1800, width, height);
+    rect = Rect(1900, 1900, width, height);
     partial_image = image(rect);
 
     resize(partial_image, show_image, Size(partial_image.cols*2.0, partial_image.rows*2.0));

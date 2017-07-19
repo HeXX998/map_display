@@ -53,6 +53,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
    FILES
    Pose.msg
+   Mark.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -128,6 +129,7 @@ include_directories(
 #   src/${PROJECT_NAME}/map_display.cpp
 # )
 add_executable( map_display src/map_display.cpp )
+add_executable( robot_trace src/robot_trace.cpp )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -148,9 +150,12 @@ add_executable( map_display src/map_display.cpp )
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 add_dependencies(map_display map_display_generate_messages_cpp)
+add_dependencies(robot_trace map_display_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(map_display ${catkin_LIBRARIES})
+target_link_libraries(robot_trace ${catkin_LIBRARIES})
+
 
 #############
 ## Install ##

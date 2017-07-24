@@ -130,6 +130,7 @@ include_directories(
 # )
 add_executable( map_display src/map_display.cpp )
 add_executable( robot_trace src/robot_trace.cpp )
+add_executable( pose_transfer src/pose_transfer.cpp )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -151,10 +152,12 @@ add_executable( robot_trace src/robot_trace.cpp )
 ## same as for the library above
 add_dependencies(map_display map_display_generate_messages_cpp)
 add_dependencies(robot_trace map_display_generate_messages_cpp)
+add_dependencies(pose_transfer map_display_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(map_display ${catkin_LIBRARIES})
 target_link_libraries(robot_trace ${catkin_LIBRARIES})
+target_link_libraries(pose_transfer ${catkin_LIBRARIES})
 
 
 #############

@@ -50,7 +50,7 @@ void on_mouse(int Event, int x, int y, int flags, void*) {
                 xt = x;
                 yt = y;
                 if(has_pose) {
-                    circle(temp, Point(xp, yp), 5, Scalar(255), -1, CV_AA);
+                    circle(temp, Point(xp, yp), 4, Scalar(255), -1, CV_AA);
                 }
 		show_image = temp.clone();
 	    }
@@ -80,7 +80,7 @@ void poseCallback(const nav_msgs::Odometry msg) {
     printf("[%lf, %lf]\n", x, y);
     
     Mat temp = mark_image.clone();
-    circle(temp, Point(x,y), 5, Scalar(255), -1, CV_AA);
+    circle(temp, Point(x,y), 4, Scalar(255), -1, CV_AA);
     has_pose = true;
     xp = x;
     yp = y;

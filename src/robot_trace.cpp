@@ -33,7 +33,7 @@ void markCallback(const map_display::Mark msg) {
 
 void poseCallback(const nav_msgs::Odometry msg) {
 //  double x = (((double)msg.xPose)*20 + 200)*2;
-//  double y = (((double)msg.yPose)*20 + 200)*2;
+//  double y = (((double)msg.yPose)*20 + 200)*2; 
     printf("POSE GET\n");
     geometry_msgs::PoseWithCovariance pwc = msg.pose;
     geometry_msgs::Pose p = pwc.pose;

@@ -1,0 +1,10 @@
+<launch>
+	<!-- rosaria -->
+	<node pkg="rosaria" type="RosAria" name="RosAria" output="screen" />
+
+	<!-- map_display -->
+	<node pkg="map_display" type="map_display" name="map_display" output="screen" args="$(find launch)/maps/map.pgm 400 400" />
+
+        <!-- pose_transfer -->
+	<node pkg="map_display" type="pose_transfer" name="pose_transfer" output="screen"/>
+</launch>

@@ -15,7 +15,7 @@
 #include <cmath>
 #include <stdio.h>
 
-ros::Publisher posePub;
+ros::Publisher posePub, goalPub;
 
 void poseCallback(const nav_msgs::Odometry msg) {
     printf("POSE GET\n");
@@ -44,11 +44,33 @@ void poseCallback(const nav_msgs::Odometry msg) {
     posePub.publish(message);
 }
 
+void goalCallback(const map_display::Pose msg) {
+    move_base_msgs::MoveBaseGoal goal;
+
+    goal.target_pose.header.frame_id = "map";
+    goal.target_pose.header.stamp = ros::Time::now();
+    goal.target_pose.pose.position.x = msg.xPose;
+    goal.target_pose.pose.position.y = msg.yPose;
+    
+    geometry_msgs::Quaternion qua_dir;
+    qua_dir = tf::createQuaternionMsgFromRollPitchYaw(0, 0, 0);
+    goal.target_pose.pose.orientation = qua_dir;
+    move_base_msgs::MoveBaseActionGoal actionGoal;
+
+    actionGoal.goal_id.id = "goal";
+    actionGoal.goal = goal;
+    goalPub.publish(actionGoal);
+}
+
 int main(int argc, char** argv) {
     ros::init(argc, argv, "map_display");
     ros::NodeHandle n;
+
     posePub = n.advertise<map_display::Pose>("map_display/pose", 1);
+    goalPub = n.advertise<move_base_msgs::MoveBaseActionGoal>("move_base/goal", 1);
+
     ros::Subscriber poseSub = n.subscribe("/RosAria/pose", 1, poseCallback);
+    ros::Subscriber goalSub = n.subscribe("map_display/goal", 1, goalCallback);
 
     while(n.ok()) {
         ros::spin();
